@@ -48,7 +48,7 @@ class OverrideJPanel extends JPanel {
     public void paintComponent(Graphics g){
         super.paintComponent(g);
         g.drawOval(x, y, 5, 5);
-        tendToRight();
+        moveMonteCarlo();
     }
 
     private void randomStepFourDirections(){
@@ -98,22 +98,48 @@ class OverrideJPanel extends JPanel {
     private void tendTowardsMouse(){
         Random random = new Random();
         float x = random.nextFloat();
+
         PointerInfo info = MouseInfo.getPointerInfo();
-        int stepX = OverrideJPanel.x, stepY = OverrideJPanel.y;
-        if(info.getLocation().x < x){
-            stepX *= -1;
-        }
-        if(info.getLocation().y < y){
-            stepY *= -1;
-        }
-        if(x < .4){
-            OverrideJPanel.x += stepX;
-        } else if(x < .6) {
-            OverrideJPanel.x -= stepX;
-        } else if(x < .8){
-            OverrideJPanel.y += stepY;
+        Point point = info.getLocation();
+
+        if (x < .5) {
+            if (point.x > OverrideJPanel.x) {
+                OverrideJPanel.x += OverrideJPanel.stepPixels;
+            } else {
+                OverrideJPanel.x -= OverrideJPanel.stepPixels;
+            }
+            if (point.y > OverrideJPanel.y) {
+                OverrideJPanel.y += OverrideJPanel.stepPixels;
+            } else {
+                OverrideJPanel.y -= OverrideJPanel.stepPixels;
+            }
         } else {
-            OverrideJPanel.y -= stepY;
+            int moveX =  random.nextInt(3) - 1,
+                    moveY = random.nextInt(3) - 1;
+            OverrideJPanel.x += moveX * OverrideJPanel.stepPixels;
+            OverrideJPanel.y += moveY * OverrideJPanel.stepPixels;
         }
     }
+
+    private void moveMonteCarlo(){
+        OverrideJPanel.x += map(monteCarlo(), -1.0f, 1.0f, -25.0f, 25.0f);
+        OverrideJPanel.y += map(monteCarlo(), -1.0f, 1.0f, -25.0f, 25.0f);
+    }
+
+    private int map(float x, float min1, float max1, float min2, float max2){
+        return Math.round(min2 + (max2 - min2) * ((x - min1) / (max1 - min1)));
+    }
+
+    private float monteCarlo(){
+        Random random = new Random();
+        while(true){
+            float x = random.nextFloat();
+            float y = random.nextFloat();
+
+            if(y < x){
+                return x;
+            }
+        }
+    }
+
 }
